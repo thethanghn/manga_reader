@@ -1,7 +1,7 @@
 package com.example.manga_reader;
 
-import android.os.Bundle;
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.Menu;
 
 public class MainActivity extends Activity {
@@ -10,6 +10,13 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		setupDrawer();
+	}
+
+	private void setupDrawer() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
