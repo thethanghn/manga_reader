@@ -1,14 +1,15 @@
-package com.example.manga_reader;
+package com.nttconsulting.manga_reader;
 
-import java.util.Locale;
+import java.io.IOException;
+
+import org.json.JSONException;
 
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.SearchManager;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
@@ -19,9 +20,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.example.manga_reader.R;
+import com.nttconsulting.data.Manga;
 
 public class MainActivity extends Activity {
 	private CharSequence mTitle;
@@ -34,6 +37,11 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		if (android.os.Build.VERSION.SDK_INT > 9) {
+		    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+		    StrictMode.setThreadPolicy(policy);
+		}
 		
 		setupDrawer(savedInstanceState);
 	}
@@ -180,14 +188,31 @@ public class MainActivity extends Activity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_planet, container, false);
-            int i = getArguments().getInt(ARG_PLANET_NUMBER);
-            String planet = getResources().getStringArray(R.array.planets_array)[i];
-
-            int imageId = getResources().getIdentifier(planet.toLowerCase(Locale.getDefault()),
-                            "drawable", getActivity().getPackageName());
-            ((ImageView) rootView.findViewById(R.id.image)).setImageResource(imageId);
-            getActivity().setTitle(planet);
+        	Activity activity = getActivity();
+            View rootView = inflater.inflate(R.layout.manga_list, container, false);
+            ListView mangaList = (ListView) rootView.findViewById(R.id.manga_list);
+            
+            
+            Manga[] mangas = null;
+			try {
+				mangas = Manga.getMangaList(activity.getApplicationContext());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				Toast.makeText(activity, "Unable to get data", 2000).show();
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				String m = e.getMessage();
+				Toast.makeText(activity, "Unable to contact to server" + m, 2000).show();
+			}
+            String[] titles = new String[mangas.length];
+            for(int i = 0; i < mangas.length;i++) {
+            	titles[i] = mangas[i].title;
+            }
+        
+            mangaList.setAdapter(new ArrayAdapter<String>(activity, R.layout.manga_list_item, titles));
+            
+            activity.setTitle(R.string.manga_list);
             return rootView;
         }
     }
