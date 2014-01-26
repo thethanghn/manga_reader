@@ -7,10 +7,14 @@ import java.io.InputStreamReader;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.DefaultHttpClient;
+
+import android.util.Log;
 
 public class HttpHelper {
 	public static String convertStreamToString(InputStream is) {
@@ -59,5 +63,24 @@ public class HttpHelper {
         } catch (IOException e) {
         }
         return null;
+    }
+    
+    public static boolean head(String url)
+    {
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpHead head = new HttpHead(url); 
+        HttpResponse response;
+        try {
+            response = httpclient.execute(head);
+            //Log.i(TAG,response.getStatusLine().toString());
+            StatusLine sl = response.getStatusLine();
+            if (sl.getStatusCode() == 200)
+             return true;
+        } catch (ClientProtocolException e) {
+        	Log.i("head", e.getMessage());
+        } catch (IOException e) {
+        	Log.i("head", e.getMessage());
+        }
+        return false;
     }
 }

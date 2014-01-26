@@ -10,6 +10,7 @@ import android.util.Log;
 
 public class DataHelper {
 	public static final String MANGA_LIST = "manga-list";
+	public static final String CHAPTER_LIST = "chapter-list";
 	public static String get(Context context, String url, boolean fromCache, String cacheFile) throws IOException {
 		String response = getFromFile(context, cacheFile);
 		if (response == null || response.length() == 0) {

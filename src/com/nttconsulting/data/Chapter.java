@@ -10,40 +10,37 @@ import org.json.JSONObject;
 import android.content.Context;
 
 import com.nttconsulting.helpers.DataHelper;
-import com.nttconsulting.helpers.HttpHelper;
 
-public class Manga implements Serializable {
+public class Chapter implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static final String api = "/mobile/mangas/";
-	public int id;
 	public String title;
-	public String name;
 	public String path;
-	public static Manga[] getMangaList(Context context) throws JSONException, IOException {
-		String jsonResponse = DataHelper.get(context, Config.SERVER_URL + api, true, DataHelper.MANGA_LIST);
+	
+	private static final String api = "/mobile/mangas/";
+	
+	public static Chapter[] getChapterList(Context context, int manga_id) throws JSONException, IOException {
+		String jsonResponse = DataHelper.get(context, Config.SERVER_URL + api + manga_id + "/chapters", true, DataHelper.CHAPTER_LIST + manga_id);
 		JSONArray json= new JSONArray(jsonResponse);
 		
 		
-		Manga[] mangas = new Manga[json.length()];
+		Chapter[] list = new Chapter[json.length()];
 		for(int i =0; i < json.length();i++) {
-			Manga m = new Manga();
+			Chapter m = new Chapter();
 			JSONObject o = (JSONObject) json.get(i);
-			m.id = o.getInt("id");
-			m.name = o.getString("name");
 			m.title = o.getString("title");
 			m.path = o.getString("path");
-			mangas[i] = m;
+			list[i] = m;
 		}
 		
-		return mangas;
+		return list;
 	}
 	
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return name;
+		return title;
 	}
 }

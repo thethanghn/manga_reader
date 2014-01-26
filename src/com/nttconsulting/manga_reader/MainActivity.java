@@ -1,8 +1,6 @@
 package com.nttconsulting.manga_reader;
 
-import java.io.IOException;
 
-import org.json.JSONException;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -12,18 +10,16 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.example.manga_reader.R;
+import com.nttconsulting.manga_reader.R;
 import com.nttconsulting.data.Manga;
 
 public class MainActivity extends Activity {
@@ -33,9 +29,14 @@ public class MainActivity extends Activity {
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
 	private String[] mPlanetTitles;
+	
+	public Manga selectedManga;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Window window = getWindow();
+		window.requestFeature(Window.FEATURE_PROGRESS);
 		setContentView(R.layout.activity_main);
 		
 		if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -136,9 +137,9 @@ public class MainActivity extends Activity {
 
     private void selectItem(int position) {
         // update the main content by replacing fragments
-        Fragment fragment = new PlanetFragment();
+        Fragment fragment = new MangaListFragment();
         Bundle args = new Bundle();
-        args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
+        args.putInt(MangaListFragment.ARG_PLANET_NUMBER, position);
         fragment.setArguments(args);
 
         FragmentManager fragmentManager = getFragmentManager();
@@ -173,47 +174,5 @@ public class MainActivity extends Activity {
         super.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggls
         mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    /**
-     * Fragment that appears in the "content_frame", shows a planet
-     */
-    public static class PlanetFragment extends Fragment {
-        public static final String ARG_PLANET_NUMBER = "planet_number";
-
-        public PlanetFragment() {
-            // Empty constructor required for fragment subclasses
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-        	Activity activity = getActivity();
-            View rootView = inflater.inflate(R.layout.manga_list, container, false);
-            ListView mangaList = (ListView) rootView.findViewById(R.id.manga_list);
-            
-            
-            Manga[] mangas = null;
-			try {
-				mangas = Manga.getMangaList(activity.getApplicationContext());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				Toast.makeText(activity, "Unable to get data", 2000).show();
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				String m = e.getMessage();
-				Toast.makeText(activity, "Unable to contact to server" + m, 2000).show();
-			}
-            String[] titles = new String[mangas.length];
-            for(int i = 0; i < mangas.length;i++) {
-            	titles[i] = mangas[i].title;
-            }
-        
-            mangaList.setAdapter(new ArrayAdapter<String>(activity, R.layout.manga_list_item, titles));
-            
-            activity.setTitle(R.string.manga_list);
-            return rootView;
-        }
     }
 }
