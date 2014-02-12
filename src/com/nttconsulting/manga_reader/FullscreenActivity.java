@@ -1,31 +1,23 @@
 package com.nttconsulting.manga_reader;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.ArrayList;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.DisplayMetrics;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.ImageSwitcher;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.Toast;
-import android.widget.ViewSwitcher.ViewFactory;
 
 import com.nttconsulting.data.Chapter;
 import com.nttconsulting.data.Manga;
+import com.nttconsulting.helpers.MangaPagerAdapter;
 import com.nttconsulting.helpers.PathHelper;
 import com.nttconsulting.helpers.SimpleGestureFilter;
-import com.nttconsulting.helpers.SimpleGestureFilter.SimpleGestureListener;
 import com.nttconsulting.manga_reader.util.SystemUiHider;
 
 /**
@@ -34,7 +26,7 @@ import com.nttconsulting.manga_reader.util.SystemUiHider;
  * 
  * @see SystemUiHider
  */
-public class FullscreenActivity extends Activity implements ViewFactory, SimpleGestureListener {
+public class FullscreenActivity extends Activity {
 	
 	protected static final float SWIPE_MAX_OFF_PATH =550;
 
@@ -43,9 +35,14 @@ public class FullscreenActivity extends Activity implements ViewFactory, SimpleG
 	protected static final float SWIPE_THRESHOLD_VELOCITY = 100;
 	
 	private int current_position = 0;
-	private ArrayList<Uri> all_images = new ArrayList<Uri>();
+	private Uri[] all_images;
 
 	private SimpleGestureFilter detector;
+	private MangaPagerAdapter mangaPagerAdapter;
+
+	private Toast pageNumberToast;
+
+	private ViewPager viewPager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,62 +50,71 @@ public class FullscreenActivity extends Activity implements ViewFactory, SimpleG
 		setContentView(R.layout.activity_fullscreen);
 		getActionBar().hide();
 		
+		final Activity activity = this;
+		
 		// load the image
 		Bundle bundle = getIntent().getExtras();
 		Manga manga = (Manga) bundle.getSerializable("manga");
 		Chapter chapter = (Chapter) bundle.getSerializable("chapter");
+		
+		SharedPreferences settings = getSharedPreferences("current", 0);
+		final int current = settings.getInt("current", 1);
+		
 		// load images
 		String dir = PathHelper.getStorageDir(manga, chapter);
 		String[] files = new File(dir).list();
-		for(String file : files) {
-			all_images.add(Uri.parse(dir + file));
+		all_images = new Uri[files.length];
+		for(int i = 0; i < files.length; i++) {
+			String file = files[i];
+			all_images[i]  = Uri.parse(dir + file);
 		}
+		
+		
+		viewPager = (ViewPager) findViewById(R.id.view_pager);
+		mangaPagerAdapter = new MangaPagerAdapter(all_images);
+		viewPager.setAdapter(mangaPagerAdapter);
+		viewPager.setCurrentItem(current);
+		viewPager.setOnPageChangeListener(new OnPageChangeListener() {
 
-		Uri uri = all_images.get(current_position++);
-		
-		
-		final ImageSwitcher is = (ImageSwitcher) findViewById(R.id.image_switcher);
-		is.setFactory(this);
-		is.setImageURI(uri);
-		
-		detector = new SimpleGestureFilter(this, this);
+			@Override
+			public void onPageScrollStateChanged(int arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onPageSelected(int arg0) {
+				// TODO Auto-generated method stub
+				showPageNumber(activity, (arg0 + 1));
+			}});
+		showPageNumber(activity, current);
 	}
 	
 	@Override
-	public View makeView() {
-		ImageView iView = new ImageView(this);
-        iView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        iView.setLayoutParams(new 
-                ImageSwitcher.LayoutParams(
-                        LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT));
-        iView.setBackgroundColor(0xFF000000);
-        Uri uri = all_images.get(current_position++);
-        Drawable drawable = null;
-        try {
-            InputStream inputStream = getContentResolver().openInputStream(uri);
-            drawable = Drawable.createFromStream(inputStream, uri.toString() );
-        } catch (FileNotFoundException e) {
-            //drawable = getResources().getDrawable(R.drawable.default_image);
-        }
-        
-        Bitmap bitmap = BitmapFactory.decodeFile(uri.getPath());
-
-        int imageWidth = bitmap.getWidth();
-        int imageHeight = bitmap.getHeight();
-
-        int[] dim = getScreenD(); //this method should return the width of device screen.
-        float scaleFactor = (float)newWidth/(float)imageWidth;
-        int newHeight = (int)(imageHeight * scaleFactor);
-
-        bitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
-        iView.setImageBitmap(bitmap);
-        
-        
-        //iView.setScaleType(ScaleType.FIT_XY);
-        //iView.setImageDrawable(drawable);
-        
-        //iView.setImageURI(uri);
-        return iView;
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+		
+		SharedPreferences settings = getSharedPreferences("current", 0);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putInt("current", viewPager.getCurrentItem());
+		
+		// Commit the edits!
+		editor.commit();
+	}
+	
+	private void showPageNumber(Context context, int pageNbr) {
+		if (pageNumberToast == null) {
+			pageNumberToast = Toast.makeText(context, "", 3000);
+		}
+		pageNumberToast.setText("Page: " + pageNbr + "/" + all_images.length);
+		pageNumberToast.show();
 	}
 	
 	private int[] getScreenD() {
@@ -117,27 +123,5 @@ public class FullscreenActivity extends Activity implements ViewFactory, SimpleG
 		int height = displaymetrics.heightPixels;
 		int width = displaymetrics.widthPixels;
 		return new int[]{width, height};
-	}
-
-	@Override
-	public boolean dispatchTouchEvent(MotionEvent ev) {
-		// TODO Auto-generated method stub
-		this.detector.onTouchEvent(ev);
-		return super.dispatchTouchEvent(ev);
-	}
-
-	@Override
-	public void onSwipe(int direction) {
-		// TODO Auto-generated method stub
-		ImageSwitcher imageSwitcher = (ImageSwitcher) findViewById(R.id.image_switcher);
-		//imageSwitcher.setImageURI(all_images.get(current_position++));
-		imageSwitcher.showNext();
-		Toast.makeText(this, "swipe", 3000).show();
-	}
-
-	@Override
-	public void onDoubleTap() {
-		// TODO Auto-generated method stub
-		Toast.makeText(this, "double tap", 3000).show();
 	}
 }

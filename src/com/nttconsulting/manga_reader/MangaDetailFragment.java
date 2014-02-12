@@ -124,6 +124,7 @@ public class MangaDetailFragment extends Fragment {
 		Bundle data = new Bundle();
 		data.putSerializable("manga", activity.selectedManga);
 		data.putSerializable("chapter", selectedChapter);
+		data.putInt("current", 10);
 		intent.putExtras(data);
 		startActivity(intent);
 	}

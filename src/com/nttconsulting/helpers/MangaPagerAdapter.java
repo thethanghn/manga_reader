@@ -1,7 +1,6 @@
 package com.nttconsulting.helpers;
 
 import uk.co.senab.photoview.PhotoView;
-import uk.co.senab.photoview.sample.R;
 import android.net.Uri;
 import android.support.v4.view.PagerAdapter;
 import android.view.View;
@@ -41,5 +40,4 @@ public class MangaPagerAdapter extends PagerAdapter {
 	public boolean isViewFromObject(View view, Object object) {
 		return view == object;
 	}
-
 }

@@ -106,7 +106,9 @@ public class DownloadTask extends AsyncTask<String, Integer, String> {
 	private MangaPage pageExists(String url, int i) {
 		// TODO Auto-generated method stub
     	String pattern1 = "([\\w:/\\.]+)(/\\d+-\\d+-)(\\d+)(.+)";
+    	//http://www.mangareader.net/11-eyes/6
     	String pattern2 = "([\\w:/\\.]+)(/.*)(/\\d+)(/\\d+)?";
+    	//http://www.mangareader.net/1703-54124-1/11-eyes/chapter-1.html
     	if (url.matches(pattern1)) {
     		return new MangaPage(i, url.replaceAll(pattern1, "$1$2" + i + "$4"), pattern1);
     	} else if (url.matches(pattern2)) {

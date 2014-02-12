@@ -2,22 +2,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0099cc"
+    android:background="#000"
     tools:context=".FullscreenActivity" >
 
-        <ScrollView
-            android:id="@+id/fullscreen_scrollview"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:background="@drawable/ic_launcher"
-            android:gravity="center"
-            android:keepScreenOn="true" >
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:keepScreenOn="true" >
+    </android.support.v4.view.ViewPager>
 
-        <ImageSwitcher
-            android:id="@+id/image_switcher"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:gravity="center" >
-		</ImageSwitcher>
-	</ScrollView>
 </FrameLayout>
