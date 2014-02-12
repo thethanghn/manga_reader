@@ -1,5 +1,7 @@
 <resources>
 
     <color name="black_overlay">#66000000</color>
-
+	<color name="main_drawer">#252f2f</color>
+	<color name="main_drawer_selected">#546464</color>
+	<color name="main_drawer_divider">#000</color>
 </resources>

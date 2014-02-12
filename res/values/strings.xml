@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">manga-reader</string>
+    <string name="app_name">Manga Viet</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
 
-    <string-array name="planets_array">
-        <item>Mercury</item>
-        <item>Venus</item>
-        <item>Earth</item>
-        <item>Mars</item>
-        <item>Jupiter</item>
-        <item>Saturn</item>
-        <item>Uranus</item>
-        <item>Neptune</item>
+    <string-array name="main_drawer_title_array">
+        <item>All Manga</item>
+        <item>Favorite</item>
+    </string-array>
+    <string-array name="main_drawer_icon_array">
+        <item>ic_drawer_all_manga</item>
+        <item>ic_drawer_favorite</item>
     </string-array>
 
-    <string name="manga_list">Mangas</string>
+    <string name="manga_list">Manga Viet</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
     <string name="action_websearch">Web search</string>
@@ -26,5 +24,8 @@
     <string name="title_activity_fullscreen">FullscreenActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
-
+    <string name="title_activity_manga_list_tab">MangaListTab</string>
+    <string name="title_activity_manga_list">MangaListActivity</string>
+	<string name="main_tab_first">Listing</string>
+	<string name="main_tab_second">Filter</string>
 </resources>

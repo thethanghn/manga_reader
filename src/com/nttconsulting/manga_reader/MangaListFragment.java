@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,8 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TabHost;
+import android.widget.TabHost.TabSpec;
 import android.widget.Toast;
 
 import com.nttconsulting.manga_reader.R;
@@ -37,8 +40,17 @@ public class MangaListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
     	final MainActivity activity = (MainActivity) getActivity();
-        View rootView = inflater.inflate(R.layout.manga_list, container, false);
-        ListView mangaList = (ListView) rootView.findViewById(R.id.manga_list);
+        TabHost tabHost = (TabHost) inflater.inflate(R.layout.all_manga, container, false);
+        ListView mangaList = (ListView) tabHost.findViewById(R.id.manga_list);
+        
+        tabHost.setup();
+        TabSpec tab1 = tabHost.newTabSpec("tab1");
+        tab1.setIndicator(activity.getResources().getString(R.string.main_tab_first));
+        tab1.setContent(R.id.manga_list);
+        
+        TabSpec tab2 = tabHost.newTabSpec("tab2");
+        tab2.setIndicator(activity.getResources().getString(R.string.main_tab_second));
+        tab2.setContent(R.id.manga_filter);
         
         
         Manga[] mangas = null;
@@ -71,7 +83,10 @@ public class MangaListFragment extends Fragment {
         });
         
         activity.setTitle(R.string.manga_list);
-        return rootView;
+        
+        tabHost.addTab(tab1);
+        tabHost.addTab(tab2);
+        return tabHost;
     }
     
     public void displaySelectedManga() {

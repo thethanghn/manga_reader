@@ -2,6 +2,7 @@ package com.nttconsulting.manga_reader;
 
 
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -20,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.nttconsulting.manga_reader.R;
+import com.nttconsulting.ui.MainDrawerAdapter;
 import com.nttconsulting.data.Manga;
 
 public class MainActivity extends Activity {
@@ -28,9 +30,12 @@ public class MainActivity extends Activity {
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
-	private String[] mPlanetTitles;
+	private String[] mainDrawerItems;
 	
 	public Manga selectedManga;
+	private MainDrawerAdapter mainDrawerAdapter;
+	private FragmentManager fragmentManager;
+	private int selectedDrawerPosition;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +43,9 @@ public class MainActivity extends Activity {
 		Window window = getWindow();
 		window.requestFeature(Window.FEATURE_PROGRESS);
 		setContentView(R.layout.activity_main);
+		
+		fragmentManager = getFragmentManager();
+		fragmentManager.beginTransaction().replace(R.id.content_frame, new MangaListFragment()).commit();
 		
 		if (android.os.Build.VERSION.SDK_INT > 9) {
 		    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -48,38 +56,46 @@ public class MainActivity extends Activity {
 	}
 
 	private void setupDrawer(Bundle savedInstanceState) {
-		String simpleitem = "thethang";
 		mTitle = mDrawerTitle = getTitle();
-		mPlanetTitles = getResources().getStringArray(R.array.planets_array);
+		mainDrawerItems = getResources().getStringArray(R.array.main_drawer_title_array);
+		String[] icons = getResources().getStringArray(R.array.main_drawer_icon_array);
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
 		
 		//set the items to listview
-		mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, new String[] {simpleitem}));
+		mainDrawerAdapter = new MainDrawerAdapter(this, R.layout.main_drawer_list_item, mainDrawerItems, icons);
+		mDrawerList.setAdapter(mainDrawerAdapter);
+		
 		// enable ActionBar app icon to behave as action to toggle nav drawer
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
+		final ActionBar actionBar = getActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
 
         // ActionBarDrawerToggle ties together the the proper interactions
         // between the sliding drawer and the action bar app icon
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
                 mDrawerLayout,         /* DrawerLayout object */
-                R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
+                R.drawable.ic_drawer_open,  /* nav drawer image to replace 'Up' caret */
                 R.string.drawer_open,  /* "open drawer" description for accessibility */
                 R.string.drawer_close  /* "close drawer" description for accessibility */
                 ) {
             public void onDrawerClosed(View view) {
-                getActionBar().setTitle(mTitle);
+                actionBar.setTitle(mTitle);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                
+                // update the main content by replacing fragments
+                Fragment fragment = new MangaListFragment();
+                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
             }
 
             public void onDrawerOpened(View drawerView) {
-                getActionBar().setTitle(mDrawerTitle);
+                actionBar.setTitle(mDrawerTitle);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         if (savedInstanceState == null) {
             selectItem(0);
@@ -136,19 +152,11 @@ public class MainActivity extends Activity {
     }
 
     private void selectItem(int position) {
-        // update the main content by replacing fragments
-        Fragment fragment = new MangaListFragment();
-        Bundle args = new Bundle();
-        args.putInt(MangaListFragment.ARG_PLANET_NUMBER, position);
-        fragment.setArguments(args);
-
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-
         // update selected item and title, then close the drawer
-        mDrawerList.setItemChecked(position, true);
-        setTitle(mPlanetTitles[position]);
+        mainDrawerAdapter.setSelected(position);
+        setTitle(mainDrawerItems[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
+        this.selectedDrawerPosition = position;
     }
 
     @Override

@@ -38,6 +38,14 @@
             android:label="@string/title_activity_fullscreen"
             android:theme="@style/FullscreenTheme" >
         </activity>
+        <activity
+            android:name="com.nttconsulting.manga_reader.MangaListTab"
+            android:label="@string/title_activity_manga_list_tab" >
+        </activity>
+        <activity
+            android:name="com.nttconsulting.manga_reader.MangaListActivity"
+            android:label="@string/title_activity_manga_list" >
+        </activity>
     </application>
 
 </manifest>
